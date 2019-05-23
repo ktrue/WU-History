@@ -110,6 +110,12 @@ $SITE['cacheFileDir'] = './cache/';  // cache file directory
 ```
 (the same WCAPIkey and WCunits used for the WC-forecast.php script are reused with this script)
 
+## Notes:
+ - The data returned by the _WXDailyHistory.php_ script is **NOT** reformatted for number of decimal places. It just presents the data returned in the JSON from the api.weather.com query (so please don't ask me to 'fix' any decimal point issues).
+ - the api.weather.com API requires a WU/TWC API key which is only available to WU users who have stations directly submitting weather data to WeatherUnderground.
+ - the 'custom' date range query code is not implemented in V1.00 of _WXDailyHistory.php_ but may appear in subsequent releases.
+ - use the Issues function on GitHub to report problems with _WXDailyHistory.php_ -- the other parts of the code base I'll try to help, but Jim McMurry is the real authority (it is his code)
+
 ## Sample Month Output (in Saratoga template)
 
  <img src="sample-output-month.jpg" alt="sample mongh output">
