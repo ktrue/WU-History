@@ -1,0 +1,86 @@
+# WU-History - display PWS historical data from WeatherUnderground.com
+
+## Background
+
+This script set was originated by Jim McMurray (https://www.jcweather.us/) for his WeatherUnderground History page.  My thanks to Jim
+for letting the script set be adapted for the [Saratoga Template](https://saratoga-weather.org/wxtemplates/) set.  The data for the
+page originates with WeatherUnderground.com and was retrieved using a query to WXDailyHistory.asp to return a CSV formatted file
+with the WUID's station data.
+
+In May, 2019, WeatherUnderground discontinued the WXDailyHistory.asp page operation, rendering this script set non-functional.
+
+I've written a WXDailyHistory.php page to use the WU/TWC API to api.weather.com requests for JSON data, and return the CSV formatted data the script set expects.  Due to the limitations with the WU/TWC API, the WXDailyHistory.php script now stores monthly cache files of the returned JSON to speed up processing, and enable full-year queries [which do not exist in the WU/TWC API](https://docs.google.com/document/d/1eKCnKXI9xnoMGRRzOL1xPCBihNV2rOet08qpE_gArAY/edit#).
+
+The major change from the 3.4c version of the scripts is in _WU-History-inc.php_ to support the new _WXDailyHistory.php_ query instead of directly to the WU website.  If you're updating an existing V3.4c installation of the script, you likely need only those two files to restore function to your installation.
+
+## At initial installation
+
+Because _WXDailyHistory.php_ relies on cached JSON data, it's a good idea to preload you cache with historical data manually for all years you have submitted PWS data to WeatherUnderground. The easiest way to do this is via direct URL requests to your website like:
+
+```
+https://your.website.com/WXDailyHistory.php?&year=2019&graphspan=year&debug=y
+```
+Note that you may get a time-out on the page as sometimes the API is a bit laggard in response for a full month's data.  No problem, just reload the page until it shows at the bottom something like:
+
+```
+<!-- priorMonthTS='1556693999' ='2019-04-30 23:59:59 PDT' priorYM='201904' -->
+<!-- nowYM='201905' tYM='201801' priorYM='201904' fetch='' -->
+<!-- fetched 201801 data from ./cache/wu201801-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201802' priorYM='201904' fetch='' -->
+<!-- fetched 201802 data from ./cache/wu201802-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201803' priorYM='201904' fetch='' -->
+<!-- fetched 201803 data from ./cache/wu201803-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201804' priorYM='201904' fetch='' -->
+<!-- fetched 201804 data from ./cache/wu201804-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201805' priorYM='201904' fetch='' -->
+<!-- fetched 201805 data from ./cache/wu201805-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201806' priorYM='201904' fetch='' -->
+<!-- fetched 201806 data from ./cache/wu201806-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201807' priorYM='201904' fetch='' -->
+<!-- fetched 201807 data from ./cache/wu201807-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201808' priorYM='201904' fetch='' -->
+<!-- fetched 201808 data from ./cache/wu201808-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201809' priorYM='201904' fetch='' -->
+<!-- fetched 201809 data from ./cache/wu201809-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201810' priorYM='201904' fetch='' -->
+<!-- fetched 201810 data from ./cache/wu201810-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201811' priorYM='201904' fetch='' -->
+<!-- fetched 201811 data from ./cache/wu201811-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201812' priorYM='201904' fetch='' -->
+<!-- fetched 201812 data from ./cache/wu201812-KCASARAT1-e.json -->
+```
+which indicated all the needed cache files for that year (2018) are present.
+
+For the current year, you will likely see something like:
+```
+<!-- priorMonthTS='1556693999' ='2019-04-30 23:59:59 PDT' priorYM='201904' -->
+<!-- nowYM='201905' tYM='201901' priorYM='201904' fetch='' -->
+<!-- fetched 201901 data from ./cache/wu201901-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201902' priorYM='201904' fetch='' -->
+<!-- fetched 201902 data from ./cache/wu201902-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201903' priorYM='201904' fetch='' -->
+<!-- fetched 201903 data from ./cache/wu201903-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201904' priorYM='201904' fetch='' -->
+<!-- fetched 201904 data from ./cache/wu201904-KCASARAT1-e.json -->
+<!-- nowYM='201905' tYM='201905' priorYM='201904' fetch='' -->
+<!-- curl fetching 'https://api.weather.com/v2/pws/history/daily?stationId=KCASARAT1&format=json&units=e&startDate=20190501&endDate=20190531&apiKey=f00d461fe89740948d461fe897a094c3' -->
+<!-- HTTP stats:  RC=200 dest=104.100.48.232 port=443 (from sce=192.168.1.104)
+      Times: dns=0.047 conn=0.063 pxfer=0.094 get=0.078 total=0.172 secs -->
+<!-- saved 201905 data into ./cache/wu201905-KCASARAT1-e.json -->
+```
+where the current month is ALWAYS fetched and cached (since the data for the current day changes)
+
+Note that the API only seems to have data back to **2008** only.  Prior years appear to be gone from the WU database,
+so only go back to (and including 2008) or to the first year after 2008 that you started submitting data to WU.
+
+## Installation
+
+ - unpack the .zip distribution to the document root of your website (and preserve all the subdirectories/contents)
+ - customize _WU-History-inc.php_ and _WXDailyHistory.php_ with the particulars.  Note you must have a WU/TWC API Key for the script to work.
+ - upload to your website.
+ - run the cache preload described above for all the years you have been submitting data to WU (earliest data is 2008)
+
+ ## Sample Output
+
+ <img src="sample-output-day.png" alt="sample day output">
+ 

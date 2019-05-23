@@ -1,0 +1,136 @@
+/* 
+default .css file to support WU-History.php  
+Version 1.0  18 Feb 2008
+Versopm 1.1  22 Feb 2008 - Put eveything within #wuwrap per Ken True's suggestion to ensure no interferance with other css
+By Jim McMurry jmcmurry@mwt.net http://jcweather.us
+Modify this file to change the color scheme if you wish.
+If you come up with a nice one, please EMail me the .css and supporting graphics and I'll add them to the distribution package and acknowledge your efforts.
+Please give different and descriptive names to the graphic files.
+
+Color Cop is a good free program for "grabbing" colors that you see in other programs or on the web.  http://colorcop.net/features/
+Here's a couple good sites to explore color schemes:  http://www.hypergurl.com/colormatch.php and http://meyerweb.com/eric/tools/color-blend/
+For background images:  http://lab.rails2u.com/bgmaker/ and http://www.ogim.4u2ges.com/gradient-image-maker.asp
+/* -------------------------------------- */
+
+/* Basic Setup and commonly used elements */
+#wuwrap { background-color: #EEE; color: #000; font-size: 11px; font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; margin-top: 0px; margin-left: 0px; margin-right: 0px; text-align: left;}
+
+/* These control the "general links throuout the page */
+#wuwrap a { color: #213F9A; text-decoration: underline; }
+#wuwrap a:hover { color: #213F9A; text-decoration: none; }
+
+#wuwrap #content { padding-left: 10px; padding-right: 5px; background-color: #FFF; clear: both; width: 100%; }
+
+/* Some general purpose styles */
+#wuwrap TD.vaT { vertical-align: top; }
+#wuwrap TR.vaT TD { vertical-align: top; }
+#wuwrap TD.vaM { vertical-align: middle; }
+#wuwrap TR.vaM TD { vertical-align: middle; }
+#wuwrap #full { width: 99%; }
+#wuwrap .full { width: 99%; }
+#wuwrap .center { margin-left: auto; margin-right: auto; }
+#wuwrap .taL { text-align: left; }
+#wuwrap .taC { text-align: center; }
+#wuwrap .taR { text-align: right; }
+#wuwrap .nobr { white-space: nowrap; }
+#wuwrap .tm10 { margin-top: 10px; }
+#wuwrap .tm20 { margin-top: 20px; }
+#wuwrap .b { font-weight: bold; }
+#wuwrap .fwN { font-weight: normal; }
+@media print {
+  .noprint { display: none; }
+}
+
+/*  The top heading */
+#wuwrap .heading { border: 0px; padding: 0px; margin: 0px; font-size: 18px; font-weight: bold; font-style: normal; color: #000; }
+
+/*  The black line etc below the heading */
+#wuwrap .titleBar { padding: 2px; background-color: #FFFFDD; color: #333; border-top: 1px solid #333; margin-bottom: 10px; }
+
+/* The colored bar at the top of each section */
+#wuwrap .colorTop { border-width: 0px 0px 0px 0px; border-collapse: collapse; border-spacing: 0px; table-layout: fixed; width: 100%; }
+#wuwrap .colorTop .hLeft { padding:0; height:20px; width:20px; background-color: #FFFF46; border-top: 1px solid #808080; border-bottom: 1px solid #808080; border-left: 1px solid #808080; }
+#wuwrap .colorTop .hCenter { height: 20px; line-height: 20px; width: auto; font-size: 14px; font-weight: bold; color: #000; background-color: #FFFF46; border-top: 1px solid #808080; border-bottom: 1px solid #808080; }
+#wuwrap .colorTop .hRight { padding:0; height:20px; width:20px; font-size: 12px; color: #FFF; background-color: #FFFF46; border-top: 1px solid #808080; border-bottom: 1px solid #808080; border-right: 1px solid #808080; }
+#wuwrap .colorTop .hMenu { padding:0; height:20px; font-size: 12px; color: #000; background-color: #FFFF46; text-align: right; border-top: 1px solid #808080; border-bottom: 1px solid #808080; }
+#wuwrap .colorTop .sLeft { padding: 0; height: 6px; width:20px; }
+#wuwrap .colorTop .sCenter { padding: 0; height: 6px; line-height: 6px; font-size: 6px; }
+#wuwrap .colorTop .sRight { padding: 0; height: 6px; width:20px;  }
+
+/* The menu for selecting units.  This must be an id in order to gain precedence */
+#wuwrap #unitmenu a:link {color: #000; text-decoration: none;}
+#wuwrap #unitmenu a:visited{color: #000; text-decoration: none;}
+#wuwrap #unitmenu A:hover {color: #4200DD; text-decoration: none;}
+#wuwrap #unitmenu A:active {color: #4200DD; text-decoration: none;}
+
+/* The sides of the main colored box */
+#wuwrap .colorBox { border-right: 1px solid #808080; border-left: 1px solid #808080; margin: 0; padding: 0 5px 0 5px; }
+#wuwrap .colorBox .noGap { height: 1px; line-height: 1px; }
+
+/* Closes off the bottom of the main box */
+#wuwrap .colorBottom { height: 10px; width: 100%; }
+#wuwrap .colorBottom .bLeft DIV { height: 10px; width: 10px; border-top: 1px solid #808080; }
+#wuwrap .colorBottom .bCenter DIV { height: 10px; border-top: 1px solid #808080; }
+#wuwrap .colorBottom .bRight DIV { height: 10px; width: 10px; border-top: 1px solid #808080; }
+
+/* The Date selector */
+#wuwrap .selectorBox { background-color: #FFFFDD; border-top: 1px solid #CCC; }
+
+/* The table that holds the date selector(s) */
+#wuwrap .dateTable SPAN { margin: 0 10px 0 10px; white-space: nowrap; }
+#wuwrap .dateTable TD { vertical-align: middle; padding: 1px; }
+#wuwrap .dateTable A { color: #172C6C; display: block; width: 100px; margin: 2px; text-align: center; }
+#wuwrap .dateTable .dateForm { margin-left: auto; margin-right: auto; }
+#wuwrap .dateTable .dateForm SELECT { margin: 1px; }
+
+/* The tabs for daily, weekly etc. */
+#wuwrap #typeTable { margin-top: 10px; }
+#wuwrap #typeTable TD { width: 20%; text-align: center; padding: 2px; }
+#wuwrap #typeTable TD.activeTab { color: #000; border-top: 1px solid #A2A2A2; border-right: 1px solid #A2A2A2; border-left: 1px solid #A2A2A2; font-weight: bold; background: #FFF url(./wuicons/LtYellowGradient.png) repeat-x top; font-size: 13px; }
+#wuwrap #typeTable TD.inactiveTab { border-bottom: 1px solid #A2A2A2; }
+#wuwrap #typeTable TD.inactiveTab A { color: #5D5D5D; }
+
+/* The table for the top summary section */
+#wuwrap .summaryTable { width: 100%; }
+#wuwrap .summaryTable THEAD TR TD { border-bottom: 1px solid #999; font-weight: bold; padding: 2px; background-color: #FFFFDD; }
+#wuwrap .summaryTable TBODY TR TD { border-bottom: 1px dotted #CCC; padding: 3px; }
+#wuwrap .summaryTable TBODY TR:hover TD { background-color: #FFC; }
+
+/* The lower table when in "today" mode */
+#wuwrap .dailyTable { width: 100%; }
+#wuwrap .dailyTable THEAD TR TD { padding: 5px; background-color: #CCC; color: #000; font-weight: bold; border-top: 1px solid #EEE; border-left: 1px solid #EEE; border-right: 1px solid #999; border-bottom: 1px solid #999; background-image: url(./wuicons/mgray50.png); background-repeat: repeat-x; }
+#wuwrap .dailyTable TBODY TR TD { color: #333; padding: 1px; padding-left: 5px; padding: 5px; border-bottom: 1px solid #CCC; }
+#wuwrap .dailyTable TBODY TR:hover TD { background-color: #FFC; }
+
+/*  Lower table when in week, month, year etc mode  */ 
+#wuwrap .obsTable THEAD TR TD { font-weight: bold; background-color: #cdc191; border-top: 5px solid #FFF; padding: 2px; text-align: center; }
+#wuwrap .obsTable TBODY TR TD { border-bottom: 1px dotted #CCC; padding: 3px; text-align: center; }
+#wuwrap .obsTable TBODY TD.date { text-align:left; }
+#wuwrap .obsTable TBODY TR TD.HdgLt { border-bottom: 2px solid #CCC; }
+#wuwrap .obsTable TBODY TR TD.HdgDk { border-bottom: 2px solid #CCC; background-color: #FFFFDD; }
+#wuwrap .obsTable TBODY TR TD.Left {  border-left: 1px solid #CCC; }
+#wuwrap .obsTable TBODY TR TD.Right {  border-right: 1px solid #CCC; }
+#wuwrap .obsTable TBODY TR TD.BodyDk { background-color: #FFFFDD; }
+#wuwrap .obsTable TBODY TR:hover TD { background-color: #FFC; }
+
+/* The "Page Top links */
+#wuwrap .pageTop { text-align: right; margin: 10px 0 10px 0; font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 11px; }
+#wuwrap .pageTop A { color: #00F; }
+
+/* Optional right Column if used */
+#wuwrap .rightCol { margin-left: 10px; }
+#wuwrap .rightCol .rtTop  { width: 300px; border: 0; margin: 0; padding: 0; border-bottom: 1px solid #808080; }
+#wuwrap .rightCol .rtBottom  { width: 300px; border: 0; margin: 0; padding: 0; border-top: 1px solid #808080; }
+#wuwrap .rightCol .contentBox { width: 300px; border: 0; margin: 0; padding: 0; border-right: 1px solid #808080; border-left: 1px solid #808080; }
+
+/* The link to the csv file at the bottom of the page */
+#wuwrap #csvLink a { display: inline; padding: 1px 10px 1px 10px; border: 1px solid #808080; background-color: #FFFF78; color: #000; margin: 10px 0 10px 0; text-decoration: none; }
+#wuwrap #csvLink a:hover { border: 1px solid #808080; background-color: #FFFFDD; }
+
+#wuwrap .bottomBar { padding-left: 5px; padding-top: 2px; padding-bottom: 2px; margin: 0px; font-size: 13px; font-weight: bold; background-color: #FFFF46; color: #000; border: 1px solid #808080; }
+
+
+/* Wunderground logo */
+#wuwrap .logo { height: 25px; width: 53px; background-image: url(./wuicons/logo_footer.gif); background-repeat: no-repeat; }
+
+/* End WU-History.css */
