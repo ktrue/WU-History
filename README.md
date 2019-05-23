@@ -28,7 +28,7 @@ The major change from the 3.4c version of the scripts is in _WU-History-inc.php_
  Because _WXDailyHistory.php_ relies on cached JSON data, it's a good idea to preload you cache with historical data manually for all years you have submitted PWS data to WeatherUnderground. The easiest way to do this is via direct URL requests to your website like:
 
  ```
- https://your.website.com/WXDailyHistory.php?&year=2019&graphspan=year&debug=y
+ view-source:https://your.website.com/WXDailyHistory.php?&year=2019&graphspan=year&debug=y
  ```
  Note that you may get a time-out on the page as sometimes the API is a bit laggard in response for a full month's data.  No problem, just reload the page until it shows at the bottom something like:
 
