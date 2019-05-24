@@ -104,7 +104,7 @@ If running in a Saratoga template, the following can be used in _Settings.php_ i
 ```php
 $SITE['WCAPIkey'] = 'specify-your-api-key-here';
 $SITE['WCunits']  = 'e'; // ='e' for F,mph,inHg,in; ='m' for C,km/h,hPa,mm
-$SITE['WUID']  = 'KCASARAT1' // your WU PWS ID
+$SITE['WUID']  = 'KCASARAT1'; // your WU PWS ID
 $SITE['tz']   = 'America/Los_Angeles'; // timezone
 $SITE['cacheFileDir'] = './cache/';  // cache file directory
 ```
