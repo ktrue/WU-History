@@ -13,6 +13,9 @@ I've written a _WXDailyHistory.php_ page to use the WU/TWC API to api.weather.co
 
 The major change from the 3.4c version of the scripts is in _WU-History-inc.php_ to support the new _WXDailyHistory.php_ query instead of directly to the WU website.  If you're updating an existing V3.4c installation of the script, you likely need only those two files to restore function to your installation.
 
+Version 1.10 adds additional cache files for day and week data to help keep under the 1500/day, 30/minute rate limits imposed by api.weather.com PwS API.
+Also, you can include &force=1 to the URL to force a cache reload.
+
 
 ## Installation
 
@@ -95,6 +98,8 @@ $WCunits  = 'e';  // 'e'= US units F,mph,inHg,in,in
 //$WCunits  = 's';  // 's'= SI units C,m/s,hPa,mm,cm
 $ourTZ = 'America/Los_Angeles'; // our timezone
 $cacheFileDir = './cache/';  // use './' to store in current directory
+$refreshSecondsDay = 150;  // limit API calls to every 300 seconds (2.5 minutes) for day
+$refreshSeconds = 1800; // limit API calls for week/month/year data to every 1/2 hour
 # ------------------- end of settings ----------------------
 ```
 Please note that the $WCunits = 'h' or ='s' will work in the returned CSV data, the _WU-History-inc.php_ script is **NOT** adapted for those units of measure display.

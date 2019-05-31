@@ -14,10 +14,12 @@
 # during the current month.
 #
 # NOTE: the daily JSON does not include the former Conditions nor Clouds variables, so those are set to null ('')
-#
+# Also, the PWS API has a hard limit of 1500 calls/day and rate of 30 calls/minute.
+# 
 # Author: Ken True  webmaster@saratoga-weather.org 23-May-2019
 # 
 # Version 1.00 - 23-May-2019 - initial release
+# Version 1.10 - 30-May-2019 - added cache files for day/week/month to rate-limit API calls
 #
 #--------------------------------------------------------------------------------------
 $Version = "WXDailyHistory.php Version 1.00 - 23-May-2019";
@@ -31,6 +33,8 @@ $WCunits  = 'e';  // 'e'= US units F,mph,inHg,in,in
 //$WCunits  = 's';  // 's'= SI units C,m/s,hPa,mm,cm
 $ourTZ = 'America/Los_Angeles'; // our timezone
 $cacheFileDir = './cache/';  // use './' to store in current directory
+$refreshSecondsDay = 150;  // limit API calls to every 300 seconds (2.5 minutes) for day
+$refreshSeconds = 1800; // limit API calls for week/month/year data to every 1/2 hour
 # ------------------- end of settings ----------------------
 // overrides from Settings.php if available
 if(file_exists("Settings.php")) {include_once("Settings.php"); }
@@ -133,6 +137,9 @@ if( isset($_REQUEST['graphspan']) and
     isset($reqtypeValid[$_REQUEST['graphspan']]) ) {
 		$reqtype = $_REQUEST['graphspan'];
 }
+if (empty($_REQUEST['force'])) $_REQUEST['force'] = 0;
+$Force = $_REQUEST['force'];
+if($Force > 0) {$forceUpdate = true;} else {$forceUpdate = false; }
 
 if(!$reqtypeValid[$reqtype]) { // oops, a non implemented one selected
   header('Content-type: text/plain;charset=ISO-8859-1');
@@ -167,9 +174,20 @@ $ymd = "$yr$mo$da";
 if($reqtype == 'day') {
  //day
 		$url = 'https://api.weather.com/v2/pws/history/all?stationId='.$WUID.'&format=json&units='.$WCunits.'&date='.$ymd.'&apiKey='.$WCAPIkey;
-		 
-		$data = WUJCSV_fetchUrlWithoutHanging($url);
+		$cacheFileName = $cacheFileDir."wuday-$WUID-$WCunits.json";
+		$saveCache = false;
+		if(!$forceUpdate and file_exists($cacheFileName) and filemtime($cacheFileName) + $refreshSecondsDay > time()) {
+			$data = file_get_contents($cacheFileName);
+			$Status .= "<!-- day cache loaded from $cacheFileName -->\n";
+		} else {
+		    $data = WUJCSV_fetchUrlWithoutHanging($url);
+			$saveCache = true;
+		}
 		$outdata = WUJSON_decode('day',$data,$WCunits);
+		if($saveCache and strlen($data) > 100) {
+			file_put_contents($cacheFileName,$data);
+			$Status .= "<!-- day cache $cacheFileName updated. ".strlen($data)." bytes saved. -->\n";
+		} 
 		if(strlen($outdata) > 0) {
 			header('Content-type: text/plain;charset=ISO-8859-1');
 			print $outdata;
@@ -177,12 +195,24 @@ if($reqtype == 'day') {
 }
 
 if($reqtype == 'week') {
- //day
+ //week
 		$url = 'https://api.weather.com/v2/pws/observations/hourly/7day?stationId='.$WUID.'&format=json&units='.$WCunits .
            '&apiKey='.$WCAPIkey;
+		$cacheFileName = $cacheFileDir."wuweek-$WUID-$WCunits.json";
+		$saveCache = false;
+		if(!$forceUpdate and file_exists($cacheFileName) and filemtime($cacheFileName) + $refreshSeconds > time()) {
+			$data = file_get_contents($cacheFileName);
+			$Status .= "<!-- week cache loaded from $cacheFileName -->\n";
+		} else {
+		    $data = WUJCSV_fetchUrlWithoutHanging($url);
+			$saveCache = true;
+		}
 		 
-		$data = WUJCSV_fetchUrlWithoutHanging($url);
 		$outdata = WUJSON_decode('week',$data,$WCunits);
+		if($saveCache and strlen($data) > 100) {
+			file_put_contents($cacheFileName,$data);
+			$Status .= "<!-- week cache $cacheFileName updated. ".strlen($data)." bytes saved. -->\n";
+		} 
 		if(strlen($outdata) > 0) {
 			header('Content-type: text/plain;charset=ISO-8859-1');
 			print $outdata;
@@ -216,8 +246,8 @@ if($reqtype == 'month') {
 		}
 		$url = 'https://api.weather.com/v2/pws/history/daily?stationId='.$WUID.'&format=json&units='.$WCunits.  
 		'&startDate='.$sDate.'&endDate='.$eDate. '&apiKey='.$WCAPIkey;
-		if(!file_exists($cacheFileName) or 
-		  ($tYM == $nowYM) or 
+		if($forceUpdate or !file_exists($cacheFileName) or 
+		  ($tYM == $nowYM and filemtime($cacheFileName)+$refreshSeconds < time()) or 
 			($tYM == $priorYM and $fetchPriorMonth )) {
 		    $data = WUJCSV_fetchUrlWithoutHanging($url);
 			  if(preg_match('|observations|s',$data)) {
@@ -280,8 +310,8 @@ if($reqtype == 'year') {
 		if($doDebug) {
 			$Status .= "<!-- nowYM='$nowYM' tYM='$tYM' priorYM='$priorYM' fetch='$fetchPriorMonth' -->\n";
 		}
-		if(!file_exists($cacheFileName) or 
-		  ($tYM == $nowYM) or 
+		if($forceUpdate or !file_exists($cacheFileName) or 
+		  ($tYM == $nowYM and filemtime($cacheFileName)+$refreshSeconds < time() ) or 
 			($tYM == $priorYM and $fetchPriorMonth )) {
 		    $data = WUJCSV_fetchUrlWithoutHanging($url);
 		    sleep(1); // wait a bit to not pound the api the first time
