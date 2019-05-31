@@ -98,7 +98,7 @@ $WCunits  = 'e';  // 'e'= US units F,mph,inHg,in,in
 //$WCunits  = 's';  // 's'= SI units C,m/s,hPa,mm,cm
 $ourTZ = 'America/Los_Angeles'; // our timezone
 $cacheFileDir = './cache/';  // use './' to store in current directory
-$refreshSecondsDay = 150;  // limit API calls to every 300 seconds (2.5 minutes) for day
+$refreshSecondsDay = 150;  // limit API calls to every 150 seconds (2.5 minutes) for day
 $refreshSeconds = 1800; // limit API calls for week/month/year data to every 1/2 hour
 # ------------------- end of settings ----------------------
 ```
