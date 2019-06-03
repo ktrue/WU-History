@@ -20,9 +20,10 @@
 # 
 # Version 1.00 - 23-May-2019 - initial release
 # Version 1.10 - 30-May-2019 - added cache files for day/week/month to rate-limit API calls
+# Version 1.20 - 03-Jun-2019 - change to cache day files wu-YYYYMMDD-<WUID>-<WUunits>.json update today/yesterday only
 #
 #--------------------------------------------------------------------------------------
-$Version = "WXDailyHistory.php Version 1.00 - 23-May-2019";
+$Version = "WXDailyHistory.php Version 1.20 - 03-Jun-2019";
 #
 # ------------------------ settings -----------------------
 $WUID = 'KCASARAT1';   // your Wunderground PWS ID
@@ -149,6 +150,7 @@ if(!$reqtypeValid[$reqtype]) { // oops, a non implemented one selected
 	$mo = date("m");
 	$da = date("d");
 	$yr = date("Y");
+	$todayYMD = "$yr$mo$da";
   
 if(isset($_REQUEST['month']) and is_numeric($_REQUEST['month'])) {
 	if(preg_match('!^(\d{1,2})$!',$_REQUEST['month'],$m)) {
@@ -174,13 +176,29 @@ $ymd = "$yr$mo$da";
 if($reqtype == 'day') {
  //day
 		$url = 'https://api.weather.com/v2/pws/history/all?stationId='.$WUID.'&format=json&units='.$WCunits.'&date='.$ymd.'&apiKey='.$WCAPIkey;
-		$cacheFileName = $cacheFileDir."wuday-$WUID-$WCunits.json";
+		$priorYMD = date('Ymd',strtotime('yesterday'));
+		$cacheFileName = $cacheFileDir."wuday-$ymd-$WUID-$WCunits.json";
 		$saveCache = false;
-		if(!$forceUpdate and file_exists($cacheFileName) and filemtime($cacheFileName) + $refreshSecondsDay > time()) {
+		$doFetch   = false;
+		if($forceUpdate or                  // always fetch if force=1
+		   !file_exists($cacheFileName) or
+			 ($ymd == $priorYMD and           // fetch if yesterday file not complete
+			  file_exists($cacheFileName) and 
+				filemtime($cacheFileName) < strtotime('yesterday 23:59:59')
+			 ) or 
+			 (file_exists($cacheFileName) and // fetch if today file cache lifetime expires
+			  $ymd == date('Ymd') and
+				filemtime($cacheFileName) + $refreshSecondsDay < time()
+				) 
+		  ) {
+			$doFetch = true;
+		}
+		
+		if(!$doFetch) {
 			$data = file_get_contents($cacheFileName);
 			$Status .= "<!-- day cache loaded from $cacheFileName -->\n";
 		} else {
-		    $data = WUJCSV_fetchUrlWithoutHanging($url);
+		  $data = WUJCSV_fetchUrlWithoutHanging($url);
 			$saveCache = true;
 		}
 		$outdata = WUJSON_decode('day',$data,$WCunits);

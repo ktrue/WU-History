@@ -16,6 +16,11 @@ The major change from the 3.4c version of the scripts is in _WU-History-inc.php_
 Version 1.10 adds additional cache files for day and week data to help keep under the 1500/day, 30/minute rate limits imposed by api.weather.com PwS API.
 Also, you can include &force=1 to the URL to force a cache reload.
 
+Version 1.20 adds caching for the new daily files _wu-YYYYMMDD-{WUID}-{WUunits}.json_ to help avoid pesky searchbot crawlers from
+using all your allowed API calls per day.
+ - For dates prior to yesterday, the script will fetch/cache the data once (since it is a complete day's data).
+ - For yesterday, it will refresh the file once if it was not a full day of data.
+ - For today, it will refresh the file every 2.5 minutes.
 
 ## Installation
 
