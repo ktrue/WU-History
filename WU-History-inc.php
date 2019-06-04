@@ -1,6 +1,6 @@
 <?php
 $debug = false; 
-$Version = "<!-- WU-History-inc.php - Version 3.43 - 04-Jun-2019  -->\r";
+$Version = "<!-- WU-History-inc.php - Version 3.4e - 04-Jun-2019  -->\r";
 /*------------------------------------------------
 //WU-History.php
 //PHP script by Jim McMurry - jmcmurry@mwt.net - jcweather.us
