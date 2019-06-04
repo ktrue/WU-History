@@ -29,9 +29,34 @@ using all your allowed API calls per day.
  - upload to your website.
  - run the cache preload described below for all the years you have been submitting data to WU (earliest data is 2008)
 
+## Add to your Apache .htaccess file
 
+It's been reported that some unruly search harvester bots are not behaving well with the _wxwuhistory.php_ script and attempting to
+crawl backwards in the dates, and doing it rapidly and thereby exhausting your allowed 1500 API calls early in the day, so the _WXDailyHistory.php_
+script can not fetch data until 24hrs has elapsed.   I recommend that you install a block in your _.htaccess_ file like the following
+example to give the bots a 403-Forbidden instead and thereby preserve your API call quota for useful displays.
 
- ## At initial installation
+```
+SetEnvIfNoCase Referer "^qq829" TOBLOCK=1
+SetEnvIfNoCase Referer "^cnzz" TOBLOCK=1
+SetEnvIfNoCase ^User-Agent$ .*80legs.* TOBLOCK=1
+SetEnvIfNoCase ^User-Agent$ .*Ezooms.* TOBLOCK=1
+SetEnvIfNoCase ^User-Agent$ .*Ahrefs.* TOBLOCK=1
+SetEnvIfNoCase ^User-Agent$ .*package.* TOBLOCK=1
+SetEnvIfNoCase ^User-Agent$ .*scalaj-http.* TOBLOCK=1
+SetEnvIfNoCase ^User-Agent$ .*MJ12bot.* TOBLOCK=1
+
+<FilesMatch "(.*)">
+Order Allow,Deny
+Allow from all
+Deny from env=TOBLOCK
+
+# specific 'deny from nnn.nnn.nnn.nnn' entries here
+
+</FilesMatch>
+```
+
+## At initial installation
 
  Because _WXDailyHistory.php_ relies on cached JSON data, it's a good idea to preload you cache with historical data manually for all years you have submitted PWS data to WeatherUnderground. The easiest way to do this is via direct URL requests to your website like:
 
