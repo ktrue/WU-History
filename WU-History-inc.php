@@ -1,6 +1,6 @@
 <?php
 $debug = false; 
-$Version = "<!-- WU-History-inc.php - Version 3.4d - 23-May-2019  -->\r";
+$Version = "<!-- WU-History-inc.php - Version 3.43 - 04-Jun-2019  -->\r";
 /*------------------------------------------------
 //WU-History.php
 //PHP script by Jim McMurry - jmcmurry@mwt.net - jcweather.us
@@ -34,6 +34,7 @@ $Version = "<!-- WU-History-inc.php - Version 3.4d - 23-May-2019  -->\r";
 //        3.4b December 1, 2017 - more Notice: errata fixed - Ken True
 //        3.4c October 3, 2018 - return with message if data not available, fix notice errata for no data
 //        3.4d May, 23, 2019   - added support for local WXDailyHistory.php as WU discontinued WXDailyHistory.asp
+//        3.4e June 4, 2019    - fixed check for data present
 //
 //Portions of the code was borrowed from:
 //Weather Underground - wunderground.com
@@ -278,7 +279,7 @@ $rawstring = str_replace("<br>", "",$rawstring); // remove any embedded html new
 foreach (explode("\n",$rawstring) as $i => $line) {
 	$csvraw[] = explode(",", $line);
 }
-if(count($csvraw) < 20) {
+if(count($csvraw) < 1) {
 	echo "<p>Sorry... the WU data for this date is not currently available.  Please try again later.</p>\n";
 	return;
 }
