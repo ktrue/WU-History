@@ -394,7 +394,7 @@ if ($mode == 1) {
 ?>		
 		<td class="taC full noprint">
 <?php  // These are the date selectors
-    echo '<form method="post" action="' . $SITE['PHP_SELF'] . '" />';
+    echo '<form method="post" action="' . $_SERVER['PHP_SELF'] . '" />';
     echo '<table border="0" cellpadding="0" cellspacing="0" style="margin-left: auto; margin-right: auto;">  
         <tr>'; 
 	if ($selOthers) {
@@ -1405,6 +1405,7 @@ function AddDate ( $month, $day, $year, $numdays) {
 	
 function array_pure ($input) {  // Bad hack to pick out the lines w/o "\r\n" by picking known content
 	$i = 0;
+	$return = array(); // fix notice errata on empty $input array
 	while($i < count($input)) {
 		if( isset($input[$i][0][0]) and ( $input[$i][0][0] == "2" || $input[$i][0][0] == "T") ) {
 			$return[] = $input[$i];
