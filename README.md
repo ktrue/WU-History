@@ -151,10 +151,9 @@ $SITE['cacheFileDir'] = './cache/';  // cache file directory
  - the 'custom' date range query code is not implemented in V1.00 of _WXDailyHistory.php_ but may appear in subsequent releases.
  - use the Issues function on GitHub to report problems with _WXDailyHistory.php_ -- the other parts of the code base I'll try to help, but Jim McMurry is the real authority (it is his code)
 
-## Help for users of Radmil's _wxwugraphs_ scripts
+## Help for users of Radomir Luza's _wxwugraphs_ scripts
 
-Radmil had last released his scripts in 2010 with little support activity since.  His scripts used the WU _WXDailyHistory.asp_ page for data.
-The _WXDailyHistory.php_ page here seems to be useable with his scripts.  To enable it:
+Radomir Luza http://pocasi.hovnet.cz/ had last released his scripts in 2011 with little support activity since then (V1.8.0 - 2011/09/05).  The link to download the script is no longer operational (in June, 2019).  His scripts used the WU _WXDailyHistory.asp_ page for data, which is now deprecated by WeatherUnderground.  For those who have a prior installation of his scripts, the _WXDailyHistory.php_ page here seems to be useable with his scripts.  To enable it:
 
 - install _WXDailyHistory.php_ in your document root (and configure it so it is working with the WU-History-inc.php set of scripts), then change
 ```
@@ -176,7 +175,7 @@ On my copy, I found them in:
 
 
 - Do the cache preloading on your site as documented above.
-- please note that I did not write, nor directly support Radmil's wxwugraphs scripts.
+- please note that I did not write, nor directly support Radomir's wxwugraphs scripts.
 
 ## Sample Month Output (in Saratoga template)
 
