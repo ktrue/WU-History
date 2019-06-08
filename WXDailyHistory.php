@@ -21,9 +21,10 @@
 # Version 1.00 - 23-May-2019 - initial release
 # Version 1.10 - 30-May-2019 - added cache files for day/week/month to rate-limit API calls
 # Version 1.20 - 03-Jun-2019 - change to cache day files wu-YYYYMMDD-<WUID>-<WUunits>.json update today/yesterday only
+# Version 1.21 - 07-Jun-2019 - added API bug bypass for today date != today UTC date day data calls
 #
 #--------------------------------------------------------------------------------------
-$Version = "WXDailyHistory.php Version 1.20 - 03-Jun-2019";
+$Version = "WXDailyHistory.php Version 1.21 - 07-Jun-2019";
 #
 # ------------------------ settings -----------------------
 $WUID = 'KCASARAT1';   // your Wunderground PWS ID
@@ -175,7 +176,14 @@ $ymd = "$yr$mo$da";
 
 if($reqtype == 'day') {
  //day
-		$url = 'https://api.weather.com/v2/pws/history/all?stationId='.$WUID.'&format=json&units='.$WCunits.'&date='.$ymd.'&apiKey='.$WCAPIkey;
+   $todayYMDUTC = gmdate('Ymd'); // Bug bypass for when today date !== UTC date and query is for today
+	 $lookFor = $ymd;
+	 if($ymd == $todayYMD and $todayYMD !== $todayYMDUTC) {
+		$Status .= "<!-- using $todayYMDUTC for query to bypass bug -->\n";
+		$lookFor = $todayYMDUTC;
+	 }
+		// end API bug handling code for today's data
+		$url = 'https://api.weather.com/v2/pws/history/all?stationId='.$WUID.'&format=json&units='.$WCunits.'&date='.$lookFor.'&apiKey='.$WCAPIkey;
 		$priorYMD = date('Ymd',strtotime('yesterday'));
 		$cacheFileName = $cacheFileDir."wuday-$ymd-$WUID-$WCunits.json";
 		$saveCache = false;

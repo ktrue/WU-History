@@ -22,6 +22,9 @@ using all your allowed API calls per day.
  - For yesterday, it will refresh the file once if it was not a full day of data.
  - For today, it will refresh the file every 2.5 minutes.
 
+ Version 1.21 adds a bit of code to address an API bug when requesting a day's history for today (in your timezone) and the UTC date is not the same.
+ The current API will return the JSON for yesterday instead of the requested today's data.  Logic was added to the DAY processing to request the UTC date instead, which does return the JSON for today (in your timezone).  I've opened a problem report on that and will remove the bypass logic when the API is fixed.
+
 ## Installation
 
  - unpack the .zip distribution to the document root of your website (and preserve all the subdirectories/contents)
