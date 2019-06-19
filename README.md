@@ -109,7 +109,7 @@ Deny from env=TOBLOCK
  <!-- nowYM='201905' tYM='201904' priorYM='201904' fetch='' -->
  <!-- fetched 201904 data from ./cache/wu201904-KCASARAT1-e.json -->
  <!-- nowYM='201905' tYM='201905' priorYM='201904' fetch='' -->
- <!-- curl fetching 'https://api.weather.com/v2/pws/history/daily?stationId=KCASARAT1&format=json&units=e&startDate=20190501&endDate=20190531&apiKey=f00d461fe89740948d461fe897a094c3' -->
+ <!-- curl fetching 'https://api.weather.com/v2/pws/history/daily?stationId=KCASARAT1&format=json&units=e&startDate=20190501&endDate=20190531&apiKey=-your-api-key-' -->
  <!-- HTTP stats:  RC=200 dest=104.100.48.232 port=443 (from sce=192.168.1.104)
        Times: dns=0.047 conn=0.063 pxfer=0.094 get=0.078 total=0.172 secs -->
  <!-- saved 201905 data into ./cache/wu201905-KCASARAT1-e.json -->
