@@ -22,9 +22,10 @@
 # Version 1.10 - 30-May-2019 - added cache files for day/week/month to rate-limit API calls
 # Version 1.20 - 03-Jun-2019 - change to cache day files wu-YYYYMMDD-<WUID>-<WUunits>.json update today/yesterday only
 # Version 1.21 - 07-Jun-2019 - added API bug bypass for today date != today UTC date day data calls
+# Version 1.22 - 17-Jul-2019 - fix for bad local/epoch dates in API prior to 2018-07-01
 #
 #--------------------------------------------------------------------------------------
-$Version = "WXDailyHistory.php Version 1.21 - 07-Jun-2019";
+$Version = "WXDailyHistory.php Version 1.21 - 17-Jul-2019";
 #
 # ------------------------ settings -----------------------
 $WUID = 'KCASARAT1';   // your Wunderground PWS ID
@@ -453,9 +454,15 @@ from entries like:
     $doneHeader = false;
 		if(!$doHeader) {$doneHeader = true;}
 		$outrecs = '';
+		if(isset($J['observations']['tz'])) {
+			date_default_timezone_set($J['observations']['tz']);
+		}
 		foreach ($J['observations'] as $i => $obs) {
 		  $rec = array();
-			$rec[] = $obs['obsTimeLocal'];
+//			$rec[] = $obs['obsTimeLocal'];
+      $epoch = $obs['epoch'];
+			if(strlen($epoch > 10)) {$epoch = substr($epoch,0,10);}
+			$rec[] = date('Y-m-d H:i:s',$epoch);
 			$rec[] = $obs[$U]['tempAvg'];
 			$rec[] = $obs[$U]['dewptAvg'];
 			$rec[] = $obs[$U]['pressureMax']; // yes, no pressureAvg to use
@@ -564,9 +571,15 @@ to
     $doneHeader = false;
 		if(!$doHeader) {$doneHeader = true;}
 		$outrecs = '';
+		if(isset($J['observations']['tz'])) {
+			date_default_timezone_set($J['observations']['tz']);
+		}
 		foreach ($J['observations'] as $i => $obs) {
 		  $rec = array();
-			$rec[] = $obs['obsTimeLocal'];
+//			$rec[] = $obs['obsTimeLocal'];
+      $epoch = $obs['epoch'];
+			if(strlen($epoch > 10)) {$epoch = substr($epoch,0,10);}
+			$rec[] = date('Y-m-d H:i:s',$epoch);
 			$rec[] = $obs[$U]['tempHigh'];
 			$rec[] = $obs[$U]['tempAvg'];
 			$rec[] = $obs[$U]['tempLow'];
@@ -681,9 +694,15 @@ to
     $doneHeader = false;
 		if(!$doHeader) {$doneHeader = true;}
 		$outrecs = '';
+		if(isset($J['observations']['tz'])) {
+			date_default_timezone_set($J['observations']['tz']);
+		}
 		foreach ($J['observations'] as $i => $obs) {
 		  $rec = array();
-			$rec[] = $obs['obsTimeLocal'];
+//			$rec[] = $obs['obsTimeLocal'];
+      $epoch = $obs['epoch'];
+			if(strlen($epoch > 10)) {$epoch = substr($epoch,0,10);}
+			$rec[] = date('Y-m-d H:i:s',$epoch);
 			$rec[] = $obs[$U]['tempHigh'];
 			$rec[] = $obs[$U]['tempAvg'];
 			$rec[] = $obs[$U]['tempLow'];

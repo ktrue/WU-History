@@ -22,8 +22,25 @@ using all your allowed API calls per day.
  - For yesterday, it will refresh the file once if it was not a full day of data.
  - For today, it will refresh the file every 2.5 minutes.
 
- Version 1.21 adds a bit of code to address an API bug when requesting a day's history for today (in your timezone) and the UTC date is not the same.
- The current API will return the JSON for yesterday instead of the requested today's data.  Logic was added to the DAY processing to request the UTC date instead, which does return the JSON for today (in your timezone).  I've opened a problem report on that and will remove the bypass logic when the API is fixed.
+Version 1.21 adds a bit of code to address an API bug when requesting a day's history for today (in your timezone) and the UTC date is not the same.
+The current API will return the JSON for yesterday instead of the requested today's data.  Logic was added to the DAY processing to request the UTC date instead, which does return the JSON for today (in your timezone).  I've opened a problem report on that and will remove the bypass logic when the API is fixed.
+
+Version 1.22 handles bad local/epoch dates in API returns prior to 2018-07-01. It appears that prior to 2018-07, they used a 13-digit epoch date (with 000 miliseconds appended) instead of the customary 10-digit epoch date (in seconds).  That caused the JSON "obsTimeLocal" to have odd values like
+ ```
+"tz": "America/Los_Angeles",
+"obsTimeUtc": "2018-07-01T06:59:24Z",
+"obsTimeLocal": "50467-05-05 22:00:00",
+"epoch": 1530428364000,
+```
+instead of the customary contents like
+```
+"tz": "America/Los_Angeles",
+"obsTimeUtc": "2018-07-02T06:59:55Z",
+"obsTimeLocal": "2018-07-01 23:59:55",
+"epoch": 1530514795,
+```
+Version 1.22 will use the epoch date and tz value to compute a local date (after pruning the epoch date if needed).
+Old cache files with the JSON will be processed correctly, so no need to reload cache files to get the correct CSV output.  My thanks to Holger at http://dl5ark.heliohost.org for spotting the issue leading to the fix.
 
 ## Installation
 
