@@ -7,25 +7,29 @@ for letting the script set be adapted for the [Saratoga Template](https://sarato
 page originates with WeatherUnderground.com and was retrieved using a query to _WXDailyHistory.asp_ to return a CSV formatted file
 with the WUID's station data.
 
-**In May, 2019, WeatherUnderground discontinued the _WXDailyHistory.asp_ page operation, rendering this original script set non-functional.**
+**In May, 2019, WeatherUnderground intermittently discontinued the _WXDailyHistory.asp_ page operation, rendering this original script set non-functional.**
 
 I've written a _WXDailyHistory.php_ page to use the WU/TWC API to api.weather.com requests for JSON data, and return the CSV formatted data the script set expects.  Due to the limitations with the WU/TWC API, the WXDailyHistory.php script now stores monthly cache files of the returned JSON to speed up processing, and enable full-year queries [which do not exist in the WU/TWC API](https://docs.google.com/document/d/1eKCnKXI9xnoMGRRzOL1xPCBihNV2rOet08qpE_gArAY/edit#).
 
 The major change from the 3.4c version of the scripts is in _WU-History-inc.php_ to support the new _WXDailyHistory.php_ query instead of directly to the WU website.  If you're updating an existing V3.4c installation of the script, you likely need only those two files to restore function to your installation.
 
-Version 1.10 adds additional cache files for day and week data to help keep under the 1500/day, 30/minute rate limits imposed by api.weather.com PwS API.
+## WXDailyHistory.php update information
+
+__Version 1.00__ was the initial release.
+
+__Version 1.10__ adds additional cache files for day and week data to help keep under the 1500/day, 30/minute rate limits imposed by api.weather.com PwS API.
 Also, you can include &force=1 to the URL to force a cache reload.
 
-Version 1.20 adds caching for the new daily files _wu-YYYYMMDD-{WUID}-{WUunits}.json_ to help avoid pesky searchbot crawlers from
+__Version 1.20__ adds caching for the new daily files _wu-YYYYMMDD-{WUID}-{WUunits}.json_ to help avoid pesky searchbot crawlers from
 using all your allowed API calls per day.
  - For dates prior to yesterday, the script will fetch/cache the data once (since it is a complete day's data).
  - For yesterday, it will refresh the file once if it was not a full day of data.
  - For today, it will refresh the file every 2.5 minutes.
 
-Version 1.21 adds a bit of code to address an API bug when requesting a day's history for today (in your timezone) and the UTC date is not the same.
+__Version 1.21__ adds a bit of code to address an API bug when requesting a day's history for today (in your timezone) and the UTC date is not the same.
 The current API will return the JSON for yesterday instead of the requested today's data.  Logic was added to the DAY processing to request the UTC date instead, which does return the JSON for today (in your timezone).  I've opened a problem report on that and will remove the bypass logic when the API is fixed.
 
-Version 1.22 handles bad local/epoch dates in API returns prior to 2018-07-01. It appears that prior to 2018-07, they used a 13-digit epoch date (with 000 miliseconds appended) instead of the customary 10-digit epoch date (in seconds).  That caused the JSON "obsTimeLocal" to have odd values like
+__Version 1.22__ handles bad local/epoch dates in API returns prior to 2018-07-01. It appears that prior to 2018-07, they used a 13-digit epoch date (with 000 miliseconds appended) instead of the customary 10-digit epoch date (in seconds).  That caused the JSON "obsTimeLocal" to have odd values like
  ```
 "tz": "America/Los_Angeles",
 "obsTimeUtc": "2018-07-01T06:59:24Z",
@@ -39,8 +43,20 @@ instead of the customary contents like
 "obsTimeLocal": "2018-07-01 23:59:55",
 "epoch": 1530514795,
 ```
-Version 1.22 will use the epoch date and tz value to compute a local date (after pruning the epoch date if needed).
+This version will use the epoch date and tz value to compute a local date (after pruning the epoch date if needed).
 Old cache files with the JSON will be processed correctly, so no need to reload cache files to get the correct CSV output.  My thanks to Holger at http://dl5ark.heliohost.org for spotting the issue leading to the fix.
+
+__Version 1.30__ Now fixes Radomir's wxwugraphs scripts for month and year displays.
+- Install __WXDailyHistory.php__ and customize for your station.
+
+- Delete _./wxwugraphs/cache/_ entries with station data (since they have the bad formats that are causing the problems). Delete files/directories:
+  * _{WUID}-*.txt_   and all the
+  * _YYYY-DD_ directories
+
+Radomir's scripts should fetch/cache what's needed for proper month/year displays by calling __WXDailyHistory.php__ using your existing JSON caches and save the resulting CSV files in the wxwugraphs cache directory.
+You may have to call the wugraphs.php/wxwugraphs.php page with ?force=1 to get it to regenerate the local cache files needed.
+
+There are still issues with the with the Sun/Solar tab and Wunderground API source, but the others now seem to work fine.  Thanks again to Holger for additional testing.
 
 ## Installation
 
@@ -195,7 +211,7 @@ On my copy, I found them in:
 
 
 - Do the cache preloading on your site as documented above.
-- please note that I did not write, nor directly support Radomir's wxwugraphs scripts.
+- please note that I did not write, nor directly support Radomir's wxwugraphs/*.php scripts.  I do provide support for the __WXDailyHistory.php__ which provides the CSV data needed for his scripts in wudata mode.
 
 ## Sample Month Output (in Saratoga template)
 

@@ -23,9 +23,10 @@
 # Version 1.20 - 03-Jun-2019 - change to cache day files wu-YYYYMMDD-<WUID>-<WUunits>.json update today/yesterday only
 # Version 1.21 - 07-Jun-2019 - added API bug bypass for today date != today UTC date day data calls
 # Version 1.22 - 17-Jul-2019 - fix for bad local/epoch dates in API prior to 2018-07-01
+# Version 1.30 - 18-Jul-2019 - revamped day/month/year CSV output to match WU CSV output with decimals for rain/baro
 #
 #--------------------------------------------------------------------------------------
-$Version = "WXDailyHistory.php Version 1.21 - 17-Jul-2019";
+$Version = "WXDailyHistory.php Version 1.30 - 18-Jul-2019";
 #
 # ------------------------ settings -----------------------
 $WUID = 'KCASARAT1';   // your Wunderground PWS ID
@@ -145,7 +146,7 @@ $Force = $_REQUEST['force'];
 if($Force > 0) {$forceUpdate = true;} else {$forceUpdate = false; }
 
 if(!$reqtypeValid[$reqtype]) { // oops, a non implemented one selected
-  header('Content-type: text/plain;charset=ISO-8859-1');
+  header('Content-type: text/html;charset=ISO-8859-1');
   print '';
 	return;
 }
@@ -216,7 +217,7 @@ if($reqtype == 'day') {
 			$Status .= "<!-- day cache $cacheFileName updated. ".strlen($data)." bytes saved. -->\n";
 		} 
 		if(strlen($outdata) > 0) {
-			header('Content-type: text/plain;charset=ISO-8859-1');
+			header('Content-type: text/html;charset=ISO-8859-1');
 			print $outdata;
 		}
 }
@@ -241,7 +242,7 @@ if($reqtype == 'week') {
 			$Status .= "<!-- week cache $cacheFileName updated. ".strlen($data)." bytes saved. -->\n";
 		} 
 		if(strlen($outdata) > 0) {
-			header('Content-type: text/plain;charset=ISO-8859-1');
+			header('Content-type: text/html;charset=ISO-8859-1');
 			print $outdata;
 		}
 }
@@ -288,7 +289,7 @@ if($reqtype == 'month') {
 		$outdata = WUJSON_decode('month',$data,$WCunits);
 		
 		if(strlen($outdata) > 0) {
-			header('Content-type: text/plain;charset=ISO-8859-1');
+			header('Content-type: text/html;charset=ISO-8859-1');
 			print $outdata;
 		}
 }
@@ -319,7 +320,7 @@ if($reqtype == 'year') {
 		 }
 	
 	$outdata = '';
-	header('Content-type: text/plain;charset=ISO-8859-1');
+	header('Content-type: text/html;charset=ISO-8859-1');
 	foreach ($Months as $n => $moName) {
 		$tFirst = sprintf('%04d%02d%02d',$yr,$n+1,1);
 		$tYM = substr($tFirst,0,6);
@@ -367,7 +368,7 @@ function WUJSON_decode($type,$json,$unit,$doHeader=true) {
 	// try to make a CVS-style data file from the WU/TWC API return
 	global $JSONsection;
 	$J = json_decode($json,true);
-	$compass = array('N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW');
+	$compass = array('North','NNE','NE','ENE','East','ESE','SE','SSE','South','SSW','SW','WSW','West','WNW','NW','NNW');
 
 // ----------------------------------------------------------------------
 	if($type == 'day') { // create a daily-formatted file 
@@ -430,25 +431,38 @@ from entries like:
 */
 
     if($unit == 'e') {
-		  $headingDaily = 'Time,TemperatureF,DewpointF,PressureIn,WindDirection,WindDirectionDegrees,WindSpeedMPH,WindSpeedGustMPH,Humidity,HourlyPrecipIn,Conditions,Clouds,dailyrainin,SolarRadiationWatts/m^2,UVIndex,SoftwareType,DateUTC<br>
+		  $headingDaily = 
+'
+Time,TemperatureF,DewpointF,PressureIn,WindDirection,WindDirectionDegrees,WindSpeedMPH,WindSpeedGustMPH,Humidity,HourlyPrecipIn,Conditions,Clouds,dailyrainin,SolarRadiationWatts/m^2,UVIndex,SoftwareType,DateUTC<br>
 ';  
 	    $U = 'imperial';
+			$dpRain = '%01.2f';
+			$dpBaro = '%01.2f';
 		} elseif ($unit == 'm') {
 			$headingDaily = 
-'Time,TemperatureC,DewpointC,PressurehPa,WindDirection,WindDirectionDegrees,WindSpeedKMH,WindSpeedGustKMH,Humidity,HourlyPrecipMM,Conditions,Clouds,dailyrainMM,SolarRadiationWatts/m^2,UVIndex,SoftwareType,DateUTC<br>
+'
+Time,TemperatureC,DewpointC,PressurehPa,WindDirection,WindDirectionDegrees,WindSpeedKMH,WindSpeedGustKMH,Humidity,HourlyPrecipMM,Conditions,Clouds,dailyrainMM,SolarRadiationWatts/m^2,UVIndex,SoftwareType,DateUTC<br>
 ';
       $U = 'metric';
+			$dpRain = '%01.1f';
+			$dpBaro = '%01.1f';
 		} elseif ($unit == 's') {
 			$headingDaily = 
-'Time,TemperatureC,DewpointC,PressurehPa,WindDirection,WindDirectionDegrees,WindSpeedMPS,WindSpeedGustMPS,Humidity,HourlyPrecipMM,Conditions,Clouds,dailyrainMM,SolarRadiationWatts/m^2,UVIndex,SoftwareType,DateUTC<br>
+'
+Time,TemperatureC,DewpointC,PressurehPa,WindDirection,WindDirectionDegrees,WindSpeedMPS,WindSpeedGustMPS,Humidity,HourlyPrecipMM,Conditions,Clouds,dailyrainMM,SolarRadiationWatts/m^2,UVIndex,SoftwareType,DateUTC<br>
 ';
       $U = 'metric_SI';
+			$dpRain = '%01.1f';
+			$dpBaro = '%01.1f';
 			
 		} elseif ($unit == 'h') {
 			$headingDaily = 
-'Time,TemperatureC,DewpointC,PressureMB,WindDirection,WindDirectionDegrees,WindSpeedMPH,WindSpeedGustMPH,Humidity,HourlyPrecipMM,Conditions,Clouds,dailyrainMM,SolarRadiationWatts/m^2,UVIndex,SoftwareType,DateUTC<br>
+'
+Time,TemperatureC,DewpointC,PressureMB,WindDirection,WindDirectionDegrees,WindSpeedMPH,WindSpeedGustMPH,Humidity,HourlyPrecipMM,Conditions,Clouds,dailyrainMM,SolarRadiationWatts/m^2,UVIndex,SoftwareType,DateUTC<br>
 ';
       $U = 'uk_hybrid';
+			$dpRain = '%01.1f';
+			$dpBaro = '%01.1f';
 		}
 	
     $doneHeader = false;
@@ -465,17 +479,17 @@ from entries like:
 			$rec[] = date('Y-m-d H:i:s',$epoch);
 			$rec[] = $obs[$U]['tempAvg'];
 			$rec[] = $obs[$U]['dewptAvg'];
-			$rec[] = $obs[$U]['pressureMax']; // yes, no pressureAvg to use
+			$rec[] = sprintf($dpBaro,$obs[$U]['pressureMax']); // yes, no pressureAvg to use
 			
 			$rec[] = $compass[round($obs['winddirAvg'] / 22.5) % 16];
 			$rec[] = $obs['winddirAvg'];
 			$rec[] = $obs[$U]['windspeedAvg'];
 			$rec[] = $obs[$U]['windgustHigh'];
 			$rec[] = $obs['humidityAvg'];
-			$rec[] = $obs[$U]['precipRate']; // this may not be correct...
+			$rec[] = sprintf($dpRain,$obs[$U]['precipRate']); // this may not be correct...
 			$rec[] = ''; // no conditions available
 			$rec[] = ''; // no Clouds available
-			$rec[] = $obs[$U]['precipTotal'];
+			$rec[] = sprintf($dpRain,$obs[$U]['precipTotal']);
 			$rec[] = isset($obs['solarRadiationHigh'])?$obs['solarRadiationHigh']:'';
 			$rec[] = isset($obs['uvHigh'])?round($obs['uvHigh'],1):'';
 			$rec[] = 'n/a';
@@ -495,28 +509,33 @@ from entries like:
 			return ('');
 		}
     if($unit == 'e') {
-		  $heading = 'Date,TemperatureHighF,TemperatureAvgF,TemperatureLowF,DewpointHighF,DewpointAvgF,DewpointLowF,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxIn,PressureMinIn,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumIn<br>
-';  
+		  $heading = '
+			Date,TemperatureHighF,TemperatureAvgF,TemperatureLowF,DewpointHighF,DewpointAvgF,DewpointLowF,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxIn,PressureMinIn,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumIn<br>';  
 	    $U = 'imperial';
+			$dpRain = '%01.2f';
+			$dpBaro = '%01.2f';
 		} elseif ($unit == 'm') {
 			$heading = 
-'Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxKMH,WindSpeedAvgKMH,GustSpeedMaxKMH,PrecipitationSumCM<br>
-<br>
-';
+'
+Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxKMH,WindSpeedAvgKMH,GustSpeedMaxKMH,PrecipitationSumCM<br>';
       $U = 'metric';
+			$dpRain = '%01.1f';
+			$dpBaro = '%01.1f';
 		} elseif ($unit == 's') {
 			$heading = 
-'Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxMPS,WindSpeedAvgMPS,GustSpeedMaxMPS,PrecipitationSumCM<br>
-<br>
-';
+'
+Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxMPS,WindSpeedAvgMPS,GustSpeedMaxMPS,PrecipitationSumCM<br>';
       $U = 'metric_si';
+			$dpRain = '%01.1f';
+			$dpBaro = '%01.1f';
 			
 		} elseif ($unit == 'h') {
 			$heading = 
-'Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxMB,PressureMinMB,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumCM<br>
-<br>
-';
+'
+Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxMB,PressureMinMB,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumCM<br>';
       $U = 'uk_hybrid';
+			$dpRain = '%01.1f';
+			$dpBaro = '%01.1f';
 			
 		}
 /*
@@ -589,8 +608,8 @@ to
 			$rec[] = $obs['humidityHigh'];
 			$rec[] = $obs['humidityAvg'];
 			$rec[] = $obs['humidityLow'];
-			$rec[] = $obs[$U]['pressureMax']; 
-			$rec[] = $obs[$U]['pressureMin'];
+			$rec[] = sprintf($dpBaro,$obs[$U]['pressureMax']); 
+			$rec[] = sprintf($dpBaro,$obs[$U]['pressureMin']);
 			$rec[] = $obs[$U]['windspeedHigh'];
 			$rec[] = $obs[$U]['windspeedAvg'];
 			$rec[] = $obs[$U]['windgustHigh'];
@@ -599,7 +618,7 @@ to
 //			$rec[] = $obs[$U]['precipRate']; // this may not be correct...
 //			$rec[] = 'n/a'; // no conditions available
 //			$rec[] = 'n/a'; // no Clouds available
-			$rec[] = $obs[$U]['precipTotal'];
+			$rec[] = sprintf($dpRain,$obs[$U]['precipTotal']);
 			$rec[] = isset($obs['solarRadiationHigh'])?$obs['solarRadiationHigh']:'';
 			$rec[] = 'n/a';
 			$rec[] = $obs['obsTimeUtc'];
@@ -618,28 +637,39 @@ to
 			return ('');
 		}
     if($unit == 'e') {
-		  $heading = 'Date,TemperatureHighF,TemperatureAvgF,TemperatureLowF,DewpointHighF,DewpointAvgF,DewpointLowF,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxIn,PressureMinIn,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumIn<br>
+		  $heading = 
+'
+Date,TemperatureHighF,TemperatureAvgF,TemperatureLowF,DewpointHighF,DewpointAvgF,DewpointLowF,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxIn,PressureMinIn,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumIn<br>
 ';  
 	    $U = 'imperial';
+			$dpRain = '%01.2f';
+			$dpBaro = '%01.2f';
+			
 		} elseif ($unit == 'm') {
 			$heading = 
-'Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxKMH,WindSpeedAvgKMH,GustSpeedMaxKMH,PrecipitationSumCM<br>
-<br>
+'
+Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxKMH,WindSpeedAvgKMH,GustSpeedMaxKMH,PrecipitationSumCM<br>
 ';
       $U = 'metric';
+			$dpRain = '%01.1f';
+			$dpBaro = '%01.1f';
 		} elseif ($unit == 's') {
 			$heading = 
-'Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxMPS,WindSpeedAvgMPS,GustSpeedMaxMPS,PrecipitationSumCM<br>
-<br>
+'
+Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxMPS,WindSpeedAvgMPS,GustSpeedMaxMPS,PrecipitationSumCM<br>
 ';
       $U = 'metric_si';
+			$dpRain = '%01.1f';
+			$dpBaro = '%01.1f';
 			
 		} elseif ($unit == 'h') {
 			$heading = 
-'Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxMB,PressureMinMB,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumCM<br>
-<br>
+'
+Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxMB,PressureMinMB,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumCM<br>
 ';
       $U = 'uk_hybrid';
+			$dpRain = '%01.1f';
+			$dpBaro = '%01.1f';
 			
 		}
 /*
@@ -702,7 +732,7 @@ to
 //			$rec[] = $obs['obsTimeLocal'];
       $epoch = $obs['epoch'];
 			if(strlen($epoch > 10)) {$epoch = substr($epoch,0,10);}
-			$rec[] = date('Y-m-d H:i:s',$epoch);
+			$rec[] = date('Y-n-j',$epoch);
 			$rec[] = $obs[$U]['tempHigh'];
 			$rec[] = $obs[$U]['tempAvg'];
 			$rec[] = $obs[$U]['tempLow'];
@@ -712,20 +742,13 @@ to
 			$rec[] = $obs['humidityHigh'];
 			$rec[] = $obs['humidityAvg'];
 			$rec[] = $obs['humidityLow'];
-			$rec[] = $obs[$U]['pressureMax']; 
-			$rec[] = $obs[$U]['pressureMin'];
+			$rec[] = sprintf($dpBaro,$obs[$U]['pressureMax']); 
+			$rec[] = sprintf($dpBaro,$obs[$U]['pressureMin']);
 			$rec[] = $obs[$U]['windspeedHigh'];
 			$rec[] = $obs[$U]['windspeedAvg'];
 			$rec[] = $obs[$U]['windgustHigh'];
-//			$rec[] = $compass[round($obs['winddirAvg'] / 22.5) % 16];
-//			$rec[] = $obs['winddirAvg'];
-//			$rec[] = $obs[$U]['precipRate']; // this may not be correct...
-//			$rec[] = 'n/a'; // no conditions available
-//			$rec[] = 'n/a'; // no Clouds available
-			$rec[] = $obs[$U]['precipTotal'];
-			$rec[] = isset($obs['solarRadiationHigh'])?$obs['solarRadiationHigh']:'';
-			$rec[] = 'n/a';
-			$rec[] = $obs['obsTimeUtc'];
+			$rec[] = sprintf($dpRain,$obs[$U]['precipTotal']);
+			if(isset($obs['solarRadiationHigh'])) {$rec[] = $obs['solarRadiationHigh'];}
 			if(!$doneHeader) {
 			  $outrecs .= $heading;
 				$doneHeader = true;
