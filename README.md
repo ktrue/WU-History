@@ -58,6 +58,8 @@ You may have to call the wugraphs.php/wxwugraphs.php page with ?force=1 to get i
 
 There are still issues with the with the Sun/Solar tab and Wunderground API source, but the others now seem to work fine.  Thanks again to Holger for additional testing.
 
+__Version 1.31__ adds &numericPrecision=decimal to all the WU/TWC API calls to force returned JSON values with decimal values.  Also, some additional cURL options to help suppress caching by Akamai of the WU/TWC API returns so data is more current.  After installing this version, I recommend you reload your cache files using the __At Initial Installation__ instructions below so the cached JSON will have decimal precision.
+
 ## Installation
 
  - unpack the .zip distribution to the document root of your website (and preserve all the subdirectories/contents)

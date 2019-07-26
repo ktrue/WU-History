@@ -24,9 +24,10 @@
 # Version 1.21 - 07-Jun-2019 - added API bug bypass for today date != today UTC date day data calls
 # Version 1.22 - 17-Jul-2019 - fix for bad local/epoch dates in API prior to 2018-07-01
 # Version 1.30 - 18-Jul-2019 - revamped day/month/year CSV output to match WU CSV output with decimals for rain/baro
+# Version 1.31 - 26-Jul-2019 - add &numericPrecision=decimal to API calls to force decimal returns
 #
 #--------------------------------------------------------------------------------------
-$Version = "WXDailyHistory.php Version 1.30 - 18-Jul-2019";
+$Version = "WXDailyHistory.php Version 1.31 - 26-Jul-2019";
 #
 # ------------------------ settings -----------------------
 $WUID = 'KCASARAT1';   // your Wunderground PWS ID
@@ -185,7 +186,7 @@ if($reqtype == 'day') {
 		$lookFor = $todayYMDUTC;
 	 }
 		// end API bug handling code for today's data
-		$url = 'https://api.weather.com/v2/pws/history/all?stationId='.$WUID.'&format=json&units='.$WCunits.'&date='.$lookFor.'&apiKey='.$WCAPIkey;
+		$url = 'https://api.weather.com/v2/pws/history/all?stationId='.$WUID.'&format=json&units='.$WCunits.'&date='.$lookFor.'&apiKey='.$WCAPIkey.'&numericPrecision=decimal';
 		$priorYMD = date('Ymd',strtotime('yesterday'));
 		$cacheFileName = $cacheFileDir."wuday-$ymd-$WUID-$WCunits.json";
 		$saveCache = false;
@@ -225,7 +226,7 @@ if($reqtype == 'day') {
 if($reqtype == 'week') {
  //week
 		$url = 'https://api.weather.com/v2/pws/observations/hourly/7day?stationId='.$WUID.'&format=json&units='.$WCunits .
-           '&apiKey='.$WCAPIkey;
+           '&apiKey='.$WCAPIkey.'&numericPrecision=decimal';
 		$cacheFileName = $cacheFileDir."wuweek-$WUID-$WCunits.json";
 		$saveCache = false;
 		if(!$forceUpdate and file_exists($cacheFileName) and filemtime($cacheFileName) + $refreshSeconds > time()) {
@@ -273,7 +274,7 @@ if($reqtype == 'month') {
 		  $Status .= "<!-- priorMonthTS='$priorMonthTS' ='".date('Y-m-d H:i:s T',$priorMonthTS)."' priorYM='$priorYM' -->\n";
 		}
 		$url = 'https://api.weather.com/v2/pws/history/daily?stationId='.$WUID.'&format=json&units='.$WCunits.  
-		'&startDate='.$sDate.'&endDate='.$eDate. '&apiKey='.$WCAPIkey;
+		'&startDate='.$sDate.'&endDate='.$eDate. '&apiKey='.$WCAPIkey.'&numericPrecision=decimal';
 		if($forceUpdate or !file_exists($cacheFileName) or 
 		  ($tYM == $nowYM and filemtime($cacheFileName)+$refreshSeconds < time()) or 
 			($tYM == $priorYM and $fetchPriorMonth )) {
@@ -332,7 +333,7 @@ if($reqtype == 'year') {
     $sDate = $firstDate[$n];
 		$eDate = $lastDate[$n];
 		$url = 'https://api.weather.com/v2/pws/history/daily?stationId='.$WUID.'&format=json&units='.$WCunits.  
-		'&startDate='.$sDate.'&endDate='.$eDate. '&apiKey='.$WCAPIkey;
+		'&startDate='.$sDate.'&endDate='.$eDate. '&apiKey='.$WCAPIkey.'&numericPrecision=decimal';
 
 		$cacheFileName = $cacheFileDir."wu$tYM-$WUID-$WCunits.json";
 		if($doDebug) {
@@ -509,22 +510,26 @@ Time,TemperatureC,DewpointC,PressureMB,WindDirection,WindDirectionDegrees,WindSp
 			return ('');
 		}
     if($unit == 'e') {
-		  $heading = '
-			Date,TemperatureHighF,TemperatureAvgF,TemperatureLowF,DewpointHighF,DewpointAvgF,DewpointLowF,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxIn,PressureMinIn,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumIn<br>';  
+		  $heading = 
+'
+Date,TemperatureHighF,TemperatureAvgF,TemperatureLowF,DewpointHighF,DewpointAvgF,DewpointLowF,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxIn,PressureMinIn,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumIn<br>
+';  
 	    $U = 'imperial';
 			$dpRain = '%01.2f';
 			$dpBaro = '%01.2f';
 		} elseif ($unit == 'm') {
 			$heading = 
 '
-Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxKMH,WindSpeedAvgKMH,GustSpeedMaxKMH,PrecipitationSumCM<br>';
+Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxKMH,WindSpeedAvgKMH,GustSpeedMaxKMH,PrecipitationSumCM<br>
+';
       $U = 'metric';
 			$dpRain = '%01.1f';
 			$dpBaro = '%01.1f';
 		} elseif ($unit == 's') {
 			$heading = 
 '
-Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxMPS,WindSpeedAvgMPS,GustSpeedMaxMPS,PrecipitationSumCM<br>';
+Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxhPa,PressureMinhPa,WindSpeedMaxMPS,WindSpeedAvgMPS,GustSpeedMaxMPS,PrecipitationSumCM<br>
+';
       $U = 'metric_si';
 			$dpRain = '%01.1f';
 			$dpBaro = '%01.1f';
@@ -532,7 +537,8 @@ Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC
 		} elseif ($unit == 'h') {
 			$heading = 
 '
-Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxMB,PressureMinMB,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumCM<br>';
+Date,TemperatureHighC,TemperatureAvgC,TemperatureLowC,DewpointHighC,DewpointAvgC,DewpointLowC,HumidityHigh,HumidityAvg,HumidityLow,PressureMaxMB,PressureMinMB,WindSpeedMaxMPH,WindSpeedAvgMPH,GustSpeedMaxMPH,PrecipitationSumCM<br>
+';
       $U = 'uk_hybrid';
 			$dpRain = '%01.1f';
 			$dpBaro = '%01.1f';
@@ -782,12 +788,15 @@ function WUJCSV_fetchUrlWithoutHanging($url,$useFopen=false,$useHeader='') {
   curl_setopt($ch, CURLOPT_USERAGENT, 
     'Mozilla/5.0 (WXDailyHistory.php - saratoga-weather.org)');
   $reqHeader = array (
-         "Accept: text/html,text/plain"
-     );
+	  "Cache-Control: max-age=0,no-cache,must-revalidate",
+		"Pragma: no-cache",
+		"Accept-Encoding: gzip",
+    "Accept: text/html,application/json;q=0.9,*/*;q=0.8"
+  );
 	if(!empty($useHeader)) {$reqHeader[] = $useHeader;}
 	
-  curl_setopt($ch,CURLOPT_HTTPHEADER,$reqHeader);                          // request 
-
+  curl_setopt($ch, CURLOPT_HTTPHEADER,$reqHeader);                          // request 
+  curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');          // decode compressed returns 
   curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $numberOfSeconds);  //  connection timeout
   curl_setopt($ch, CURLOPT_TIMEOUT, $numberOfSeconds);         //  data timeout
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);              // return the data transfer
