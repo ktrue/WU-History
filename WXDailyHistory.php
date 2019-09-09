@@ -25,9 +25,10 @@
 # Version 1.22 - 17-Jul-2019 - fix for bad local/epoch dates in API prior to 2018-07-01
 # Version 1.30 - 18-Jul-2019 - revamped day/month/year CSV output to match WU CSV output with decimals for rain/baro
 # Version 1.31 - 26-Jul-2019 - add &numericPrecision=decimal to API calls to force decimal returns
+# Version 1.32 - 09-Sep-2019 - fix daily history for current date data
 #
 #--------------------------------------------------------------------------------------
-$Version = "WXDailyHistory.php Version 1.31 - 26-Jul-2019";
+$Version = "WXDailyHistory.php Version 1.32 - 09-Sep-2019";
 #
 # ------------------------ settings -----------------------
 $WUID = 'KCASARAT1';   // your Wunderground PWS ID
@@ -179,14 +180,14 @@ $ymd = "$yr$mo$da";
 
 if($reqtype == 'day') {
  //day
-   $todayYMDUTC = gmdate('Ymd'); // Bug bypass for when today date !== UTC date and query is for today
-	 $lookFor = $ymd;
-	 if($ymd == $todayYMD and $todayYMD !== $todayYMDUTC) {
-		$Status .= "<!-- using $todayYMDUTC for query to bypass bug -->\n";
-		$lookFor = $todayYMDUTC;
-	 }
-		// end API bug handling code for today's data
+	  $lookFor = $ymd;
 		$url = 'https://api.weather.com/v2/pws/history/all?stationId='.$WUID.'&format=json&units='.$WCunits.'&date='.$lookFor.'&apiKey='.$WCAPIkey.'&numericPrecision=decimal';
+		if($lookFor == $todayYMD) { // use rapid today conditions call instead
+		  $urlToday = 'https://api.weather.com/v2/pws/observations/all/1day?stationId='.$WUID.'&format=json&units='.$WCunits.
+			    '&apiKey='.$WCAPIkey.'&numericPrecision=decimal';
+		} else {
+			$urlToday = '';
+		}
 		$priorYMD = date('Ymd',strtotime('yesterday'));
 		$cacheFileName = $cacheFileDir."wuday-$ymd-$WUID-$WCunits.json";
 		$saveCache = false;
@@ -209,6 +210,9 @@ if($reqtype == 'day') {
 			$data = file_get_contents($cacheFileName);
 			$Status .= "<!-- day cache loaded from $cacheFileName -->\n";
 		} else {
+			if(strlen($urlToday) > 0) {
+				$url = $urlToday;
+			}
 		  $data = WUJCSV_fetchUrlWithoutHanging($url);
 			$saveCache = true;
 		}
