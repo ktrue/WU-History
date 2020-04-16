@@ -1,6 +1,6 @@
 <?php
 $debug = false; 
-$Version = "<!-- WU-History-inc.php - Version 3.4e - 04-Jun-2019  -->\r";
+$Version = "<!-- WU-History-inc.php - Version 3.4f - 16-Apr-2020  -->\r";
 /*------------------------------------------------
 //WU-History.php
 //PHP script by Jim McMurry - jmcmurry@mwt.net - jcweather.us
@@ -35,6 +35,7 @@ $Version = "<!-- WU-History-inc.php - Version 3.4e - 04-Jun-2019  -->\r";
 //        3.4c October 3, 2018 - return with message if data not available, fix notice errata for no data
 //        3.4d May, 23, 2019   - added support for local WXDailyHistory.php as WU discontinued WXDailyHistory.asp
 //        3.4e June 4, 2019    - fixed check for data present
+//        3.4f April 16,2020   - removed link to graphic as WU discontinued the image generation
 //
 //Portions of the code was borrowed from:
 //Weather Underground - wunderground.com
@@ -755,7 +756,9 @@ if ($mode == 1) {
 }	
 ?>	
 	<div class="taC tm10">
+ <?php if(false) { // discontinue image 3.4f as WU stopped the service ?>
 	<img src="<?php echo($WUgraphstr); ?>?day=<?php echo($da); ?>&amp;year=<?php echo($yr); ?>&amp;month=<?php echo($mo); ?>&amp;ID=<?php echo($WUID); ?>&amp;width=<?php echo($gwidth); ?>&amp;showsolarradiation=<?php if ($mode < 3) echo $gsolar?'1':'0';?>&amp;showuv=<?php if ($mode < 3) echo $guv?'1':'0'; ?>&amp;showtemp=<?php echo $gtemp?'1':'0'; ?>&amp;showpressure=<?php echo $gpress?'1':'0'; ?>&amp;showwind=<?php echo $gwind?'1':'0'; ?>&amp;showwinddir=<?php echo $gwindir?'1':'0'; ?>&amp;showrain=<?php echo $grain?'1':'0'; ?>&amp;type=<?php echo($gphrase); ?>" alt="Historical Graphs" id="wxHistoryImage" />
+  <?php } // end discontinue image ?>
 	<div class="noGap">&nbsp;</div>
 	</div>
 	</div>   <!--div class="colorBox" -->

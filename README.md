@@ -7,7 +7,7 @@ for letting the script set be adapted for the [Saratoga Template](https://sarato
 page originates with WeatherUnderground.com and was retrieved using a query to _WXDailyHistory.asp_ to return a CSV formatted file
 with the WUID's station data.
 
-**In May, 2019, WeatherUnderground intermittently discontinued the _WXDailyHistory.asp_ page operation, rendering this original script set non-functional.**
+**In May, 2019, WeatherUnderground intermittently discontinued the _WXDailyHistory.asp_ page operation, rendering this original script set non-functional.  In April, 2020, they also discontinued the graphic chart display so that has been removed in 3.4f version.**
 
 I've written a _WXDailyHistory.php_ page to use the WU/TWC API to api.weather.com requests for JSON data, and return the CSV formatted data the script set expects.  Due to the limitations with the WU/TWC API, the WXDailyHistory.php script now stores monthly cache files of the returned JSON to speed up processing, and enable full-year queries [which do not exist in the WU/TWC API](https://docs.google.com/document/d/1eKCnKXI9xnoMGRRzOL1xPCBihNV2rOet08qpE_gArAY/edit#).
 
