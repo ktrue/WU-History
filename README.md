@@ -13,6 +13,8 @@ I've written a _WXDailyHistory.php_ page to use the WU/TWC API to api.weather.co
 
 The major change from the 3.4c version of the scripts is in _WU-History-inc.php_ to support the new _WXDailyHistory.php_ query instead of directly to the WU website.  If you're updating an existing V3.4c installation of the script, you likely need only those two files to restore function to your installation.
 
+Please note that Jim's script also calls a WeatherUnderground URL to display the .gif charts for the period selected.  That functionality is based on the legacy WU website, and is likely to be deprecated and removed by WU as their site remodel progresses.  At present (March, 2020) the Daily graphs are still working, but is intermittently failing. The Monthly and Yearly graphs are mostly absent, and this is not likely to be fixed in the future as WU spins-down the old infrastructure.
+
 ## WXDailyHistory.php update information
 
 __Version 1.00__ was the initial release.
