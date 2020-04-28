@@ -1,6 +1,6 @@
 <?php
 $debug = false; 
-$Version = "<!-- WU-History-inc.php - Version 3.4f - 16-Apr-2020  -->\r";
+$Version = "<!-- WU-History-inc.php - Version 3.4g - 27-Apr-2020  -->\r";
 /*------------------------------------------------
 //WU-History.php
 //PHP script by Jim McMurry - jmcmurry@mwt.net - jcweather.us
@@ -36,6 +36,7 @@ $Version = "<!-- WU-History-inc.php - Version 3.4f - 16-Apr-2020  -->\r";
 //        3.4d May, 23, 2019   - added support for local WXDailyHistory.php as WU discontinued WXDailyHistory.asp
 //        3.4e June 4, 2019    - fixed check for data present
 //        3.4f April 16,2020   - removed link to graphic as WU discontinued the image generation
+//        3.4g April 27,2020   - fixed rain total for weekly display
 //
 //Portions of the code was borrowed from:
 //Weather Underground - wunderground.com
@@ -288,6 +289,11 @@ if(count($csvraw) < 1) {
 //print_r($csvraw);
 //exit;
 $csvdata = array_pure($csvraw);             //$csvdata has headings in row 0.  Saving a copy for no good reason
+if(!is_array($csvdata)) {
+	echo "<p>Sorry... the WU data for this date is not currently available.  Please try again later.</p>\n";
+  echo "<p><small>Reason: no data returned from WU/TWC API</small></p>\n";
+	return;
+}
 echo "<!-- Size of the array is " . sizeof($csvdata) . " -->\r";  // Thanks to Jerry Callahan for finding this issue
 foreach($csvdata as $key => &$line) {       // See if there are any deleted entries and remove them
 	if ($line[1] < -100 || $line[1] > 150) {               // If data is missing WU will usually report -999.9 or -573.3 (that is -999.9 F converted to C....)
@@ -493,7 +499,7 @@ if ($mode == 1) { echo '<td ' . $ActTab . '>' . $Langtabs[0] . '</td>' . "\n"; }
 if ($mode == 2) { echo '<td ' . $ActTab . '>' . $Langtabs[1] . '</td>' . "\n"; } else { echo '<td ' . $InacTab . '><a href="' . $callstr . '&amp;mode=2">' . $Langtabs[1] . '</a></td>' . "\n"; }		
 if ($mode == 3) { echo '<td ' . $ActTab . '>' . $Langtabs[2] . '</td>' . "\n"; } else { echo '<td ' . $InacTab . '><a href="' . $callstr . '&amp;mode=3">' . $Langtabs[2] . '</a></td>' . "\n"; }		
 if ($mode == 4) { echo '<td ' . $ActTab . '>' . $Langtabs[3] . '</td>' . "\n"; } else { echo '<td ' . $InacTab . '><a href="' . $callstr . '&amp;mode=4">' . $Langtabs[3] . '</a></td>' . "\n"; }		
-if ($mode == 5) { echo '<td ' . $ActTab . '>' . $Langtabs[4] . '</td>' . "\n"; } else { echo '<td ' . $InacTab . '><a href="' . $callstr . '&amp;mode=5">' . $Langtabs[4] . '</a></td>' . "\n"; }		
+//if ($mode == 5) { echo '<td ' . $ActTab . '>' . $Langtabs[4] . '</td>' . "\n"; } else { echo '<td ' . $InacTab . '><a href="' . $callstr . '&amp;mode=5">' . $Langtabs[4] . '</a></td>' . "\n"; }		
 ?>		
 		</tr>
 	</table>
@@ -714,6 +720,8 @@ if ($units == "M") {
 <?php
 if ($mode == 1) {
 	$current=convertRainMM($csvarray[count($csvarray)-1][12]);   
+} elseif ($mode == 2) {
+	$current=total_rain_week($csvarray,15);
 } else {
 	$current=total_rain($csvarray, 15);	
 }	
@@ -1005,7 +1013,13 @@ if (! $skipTab) {       // Begin tabular section with option to suppress
 					if ($row !== count($csvarray) - 1) {  // ie not the last row
 						if (substr($data, 0, 7) !== substr($csvarray[$row+1][0], 0, 7)) $needheading = true;
 					}
-					$data = '<td class = "date">' . substr($tdate['weekday'], 0, 3) . '</td><td class = "date"><a href="' . $PHP_SELF . '?ID=' . $WUID . '&amp;month=' . $pmo . '&amp;day=' .$pda . '&amp;year=' . $pyr . '&amp;mode=1&amp;units=' . $units . '">' . $pda . '</a></td>';  //Date/Time
+					$data = '<td class = "date">' . substr($tdate['weekday'], 0, 3) ;
+					if($mode == 2) {
+						$data .= '<br/>'.substr($csvarray[$row][0],11,5);
+					}
+					$data .=  '</td>';
+					$data .= '<td class = "date"><a href="' . $PHP_SELF . '?ID=' . $WUID . '&amp;month=' . $pmo . '&amp;day=' .$pda . '&amp;year=' . $pyr . '&amp;mode=1&amp;units=' . $units . '">' . $pda .'</a>';
+					$data .= '</td>';  //Date/Time
 				}
 				if ($col == 1) {
 					$convarray = convertTemps($data);
@@ -1322,6 +1336,26 @@ $tot=0;
 for ($row=0; $row<count($arr); $row++) {
 	$tot = $tot + $arr[$row][$col];  // Total them up.  Might be in or cm
 }
+$return = convertRainCM($tot);  // Get array with cm & in
+$return[0] = $return[0] * 10;   //Change to mm for summary  
+return $return;
+}
+
+function total_rain_week($arr, $col) {
+//Returns the total rain in a column in an array as last entry for the day
+//When in metric mode, wunderground gives us rain in cm
+global $rawunits;
+$tot=0;
+$datetot = array();
+for ($row=0; $row<count($arr); $row++) {
+	list($dt,$tm) = explode(' ',$arr[$row][0]);
+	$datetot[$dt] = $arr[$row][$col];  // get last entry in each date
+}
+print "<!-- datetot\n".print_r($datetot,true)." -->\n";
+foreach ($datetot as $i => $val) {
+	$tot = $tot + $val;
+}
+print "<!-- total_rain_week datetot\n".print_r($datetot,true)." tot=$tot -->\n";
 $return = convertRainCM($tot);  // Get array with cm & in
 $return[0] = $return[0] * 10;   //Change to mm for summary  
 return $return;
