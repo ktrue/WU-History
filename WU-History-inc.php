@@ -1,6 +1,6 @@
 <?php
 $debug = false; 
-$Version = "<!-- WU-History-inc.php - Version 3.4g - 27-Apr-2020  -->\r";
+$Version = "<!-- WU-History-inc.php - Version 3.4h - 22-Mar-2021  -->\r";
 /*------------------------------------------------
 //WU-History.php
 //PHP script by Jim McMurry - jmcmurry@mwt.net - jcweather.us
@@ -37,6 +37,7 @@ $Version = "<!-- WU-History-inc.php - Version 3.4g - 27-Apr-2020  -->\r";
 //        3.4e June 4, 2019    - fixed check for data present
 //        3.4f April 16,2020   - removed link to graphic as WU discontinued the image generation
 //        3.4g April 27,2020   - fixed rain total for weekly display
+//        3.4h March 21,2021   - fixed mktime issue with PHP8+
 //
 //Portions of the code was borrowed from:
 //Weather Underground - wunderground.com
@@ -1007,6 +1008,7 @@ if (! $skipTab) {       // Begin tabular section with option to suppress
 				$data = $csvarray[$row][$col];      
 				if ($col == 0) {
 					$pmo = substr($data, 5, 2);
+					$pmo = str_replace('-','',$pmo);
 					$pda = substr($data, strrpos($data,"-")+1, 2);
 					$pyr = substr($data, 0, 4);
 					$tdate = AddDate($pmo, $pda, $pyr, 0); // just to get the name of the day
