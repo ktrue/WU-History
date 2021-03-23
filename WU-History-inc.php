@@ -1,6 +1,6 @@
 <?php
 $debug = false; 
-$Version = "<!-- WU-History-inc.php - Version 3.4h - 22-Mar-2021  -->\r";
+$Version = "<!-- WU-History-inc.php - Version 3.4i - 23-Mar-2021  -->\r";
 /*------------------------------------------------
 //WU-History.php
 //PHP script by Jim McMurry - jmcmurry@mwt.net - jcweather.us
@@ -38,6 +38,7 @@ $Version = "<!-- WU-History-inc.php - Version 3.4h - 22-Mar-2021  -->\r";
 //        3.4f April 16,2020   - removed link to graphic as WU discontinued the image generation
 //        3.4g April 27,2020   - fixed rain total for weekly display
 //        3.4h March 21,2021   - fixed mktime issue with PHP8+
+//        3.4i March 23,2021   - fixed divide by zero issue in wDirAvg() routine
 //
 //Portions of the code was borrowed from:
 //Weather Underground - wunderground.com
@@ -1294,7 +1295,11 @@ function wDirAvg($arr) {
 			$tot = $tot + $arr[$row][5];
 		}
 	}
-	return round($tot / $num,0);
+	if($num>0) {
+	  return round($tot / $num,0);
+	} else {
+		return(0);
+	}
 }
 
 function degTotxt ( $wind ) { 
