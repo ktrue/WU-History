@@ -26,9 +26,10 @@
 # Version 1.30 - 18-Jul-2019 - revamped day/month/year CSV output to match WU CSV output with decimals for rain/baro
 # Version 1.31 - 26-Jul-2019 - add &numericPrecision=decimal to API calls to force decimal returns
 # Version 1.32 - 09-Sep-2019 - fix daily history for current date data
+# Version 1.33 - 28-May-2020 - fix Notice errata on empty windspeed/gust data for today
 #
 #--------------------------------------------------------------------------------------
-$Version = "WXDailyHistory.php Version 1.32 - 09-Sep-2019";
+$Version = "WXDailyHistory.php Version 1.33 - 28-May-2020";
 #
 # ------------------------ settings -----------------------
 $WUID = 'KCASARAT1';   // your Wunderground PWS ID
@@ -488,8 +489,8 @@ Time,TemperatureC,DewpointC,PressureMB,WindDirection,WindDirectionDegrees,WindSp
 			
 			$rec[] = $compass[round($obs['winddirAvg'] / 22.5) % 16];
 			$rec[] = $obs['winddirAvg'];
-			$rec[] = $obs[$U]['windspeedAvg'];
-			$rec[] = $obs[$U]['windgustHigh'];
+			$rec[] = !empty($obs[$U]['windspeedAvg'])?$obs[$U]['windspeedAvg']:0;
+			$rec[] = !empty($obs[$U]['windgustHigh'])?$obs[$U]['windgustHigh']:0;
 			$rec[] = $obs['humidityAvg'];
 			$rec[] = sprintf($dpRain,$obs[$U]['precipRate']); // this may not be correct...
 			$rec[] = ''; // no conditions available
